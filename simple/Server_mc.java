@@ -8,11 +8,13 @@ import java.net.*;
 // Server class 
 public class Server_mc 
 { 
+    public static IRC chatRooms = new IRC();
+
 	public static void main(String[] args) throws IOException 
 	{ 
 		// server is listening on port 5056 
 		ServerSocket ss = new ServerSocket(5056); 
-		
+
 		// running infinite loop for getting 
 		// client request 
 		while (true) 
@@ -33,7 +35,7 @@ public class Server_mc
 				System.out.println("Assigning new thread for this client"); 
 
 				// create a new thread object 
-				Thread t = new ClientHandler(s, dis, dos); 
+				Thread t = new ClientHandler(s, chatRooms, dis, dos); 
 
 				// Invoking the start() method 
 				t.start(); 
@@ -55,14 +57,16 @@ class ClientHandler extends Thread
 	final DataInputStream dis; 
 	final DataOutputStream dos; 
 	final Socket s; 
+    IRC chatRoom;
 	
 
 	// Constructor 
-	public ClientHandler(Socket s, DataInputStream dis, DataOutputStream dos) 
+	public ClientHandler(Socket s, IRC chatRoom, DataInputStream dis, DataOutputStream dos) 
 	{ 
 		this.s = s; 
 		this.dis = dis; 
 		this.dos = dos; 
+        this.chatRoom = chatRoom;
 	} 
 
 	@Override
@@ -75,13 +79,13 @@ class ClientHandler extends Thread
 			try { 
 
 				// Ask user what he wants 
-				dos.writeUTF("What do you want?[Date | Time]..\n"+ 
+				dos.writeUTF("What do you want? ( Date | Time | Create [roomName] | DisplayRooms )..\n"+ 
 							"Type Exit to terminate connection."); 
 				
 				// receive the answer from client 
 				received = dis.readUTF(); 
-				
-				if(received.equals("Exit")) 
+				String[] command = received.trim().split("[ ,\\t]+");
+				if(command[0].equals("Exit")) 
 				{ 
 					System.out.println("Client " + this.s + " sends exit..."); 
 					System.out.println("Closing this connection."); 
@@ -92,10 +96,10 @@ class ClientHandler extends Thread
 				
 				// creating Date object 
 				Date date = new Date(); 
-				
+			    	
 				// write on output stream based on the 
 				// answer from the client 
-				switch (received) { 
+				switch (command[0]) { 
 				
 					case "Date" : 
 						toreturn = fordate.format(date); 
@@ -106,7 +110,15 @@ class ClientHandler extends Thread
 						toreturn = fortime.format(date); 
 						dos.writeUTF(toreturn); 
 						break; 
-						
+                    case "Create" :
+                        if (command.length == 2) {
+                            chatRoom.createRoom(dos, command[1]);
+                            dos.writeUTF("Created chat room: " + command[1]);
+                        }
+                        break;
+                    case "DisplayRooms" :
+                        chatRoom.displayRooms(dos);
+                        break;
 					default: 
 						dos.writeUTF("Invalid input"); 
 						break; 
