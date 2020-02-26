@@ -74,7 +74,8 @@ class ClientHandler extends Thread
 	{ 
 		String received; 
 		String toreturn; 
-		while (true) 
+        boolean bl_conn=true;
+		while (bl_conn) 
 		{ 
 			try { 
 
@@ -84,7 +85,10 @@ class ClientHandler extends Thread
 				
 				// receive the answer from client 
 				received = dis.readUTF(); 
-				String[] command = received.trim().split("[ ,\\t]+");
+				String[] command = null; 
+                if(received == null)
+                    command[0] ="Exit";
+				command = received.trim().split("[ ,\\t]+");
 				if(command[0].equals("Exit")) 
 				{ 
 					System.out.println("Client " + this.s + " sends exit..."); 
@@ -123,6 +127,14 @@ class ClientHandler extends Thread
 						dos.writeUTF("Invalid input"); 
 						break; 
 				} 
+			} catch (EOFException e) { 
+					System.out.println(" No client - Connection closed"); 
+                    bl_conn =false;
+                    break;
+			} catch (SocketException e) { 
+					System.out.println(" Client crashed - Connection closed"); 
+                    bl_conn =false;
+                    break;
 			} catch (IOException e) { 
 				e.printStackTrace(); 
 			} 
