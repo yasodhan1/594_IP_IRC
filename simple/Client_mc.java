@@ -3,12 +3,22 @@ import java.lang.Runtime;
 import java.io.*; 
 import java.net.*; 
 import java.util.Scanner; 
+import java.util.NoSuchElementException;
 
 // Client class 
 public class Client_mc 
 { 
 	public static void main(String[] args) throws IOException 
 	{ 
+    Runtime.getRuntime().addShutdownHook(new Thread() 
+    {
+        @Override
+        public void run() 
+        {
+        System.out.println("Shutdown");
+        }
+    });
+    
 		try
 		{ 
 			Scanner scn = new Scanner(System.in); 
@@ -28,7 +38,11 @@ public class Client_mc
 			while (true) 
 			{ 
 				System.out.println(dis.readUTF()); 
-				String tosend = scn.nextLine(); 
+				//try {
+                    String tosend = scn.nextLine(); 
+                //} catch(NoSuchElementException e) {
+				 //   String tosend = "Exit";
+                //} 
 				dos.writeUTF(tosend); 
 				    // If client sends exit,close this connection 
 				    // and then break from the while loop 
@@ -50,6 +64,10 @@ public class Client_mc
 			dos.close(); 
         } catch(SocketException exception) {
 			System.out.println("Server sleeping "); 
+       // } catch(NoSuchElementException e) {
+        //    System.out.println("Connection closed");
+   //     } catch(InterruptedException e) {
+    //        System.out.println("Connection closed");
 		}catch(Exception e){ 
 			e.printStackTrace(); 
 		} 
