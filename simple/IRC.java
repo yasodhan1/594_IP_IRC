@@ -48,14 +48,14 @@ public class IRC {
         chatRooms.add(newRoom);
     }
 
-    public void addRoomMember(String client, List<String> roomNames) {
-        for (String n: roomNames) {
+    public void joinRoom(Socket client, String roomName) {
+        //for (String n: roomNames) {
             for (Room r: chatRooms) {
-                if (r.match(n)) {
+                if (r.match(roomName)) {
                     r.addMember(client);
                 }
             }
-        }
+       // }
     }
 
     public void removeRoomMember(String client, String roomName) {
@@ -66,14 +66,23 @@ public class IRC {
         }
     }
 
-    public void sendMessage(HashMap<String, String> messages) {
-
-        for (Map.Entry<String, String> message : messages.entrySet()) {
+    public void sendMessage(String roomName, String message) {
             for (Room r: chatRooms) {
-                if (r.match(message.getKey())) {
-                    r.sendMessage(message.getValue());
+                if (r.match(roomName)) {
+                    r.sendMessage(message);
                 }
             }
-        }
+          //  dos.writeUTF(response.toString());
+        /*
+        //for (Map.Entry<String, String> message : messages.entrySet()) {
+            for (Room r: chatRooms) {
+                //if (r.match(message.getKey())) {
+                if (r.match(message)) {
+                    r.sendMessage(message);
+                }
+            }
+       // }
+       */
     }
 }
+

@@ -8,19 +8,19 @@ import java.util.*;
 import java.net.*; 
 public class Room {
 
- List<String> roomMembers;
+ List<Socket> roomMembers;
  String roomName;
 
  Room(String roomName) {
     this.roomName = roomName;
-    roomMembers = new LinkedList<String>();
+    roomMembers = new LinkedList<Socket>();
  }
 
  public boolean match(String name) {
      return name.equals(this.roomName);
  }
 
- public void addMember(String client) {
+ public void addMember(Socket client) {
     roomMembers.add(client);
  }
 
@@ -33,15 +33,21 @@ public class Room {
  }
 
  public void displayRoomMembers(StringBuilder response) {
-         for (String m: roomMembers) {
-            response.append(m + " ");
+         for (Socket s: roomMembers) {
+            response.append(s.getInetAddress().toString() + ":" + s.getPort() + "  ");
          }
-
  }
 
  public void sendMessage(String message) {
     // Broadcast to all room members
-
+    try {
+        for (Socket s: roomMembers ) {
+            DataOutputStream clientout = new DataOutputStream(s.getOutputStream());
+            clientout.writeUTF(message);
+        }
+    } catch (IOException e) {
+        e.printStackTrace(); 
+    }
  }
 
 }

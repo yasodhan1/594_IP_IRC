@@ -119,6 +119,23 @@ class ClientHandler extends Thread
                     case "DisplayRooms" :
                         chatRoom.displayRooms(dos);
                         break;
+                    case "DisplayRoomMembers" :
+                        if (command.length == 2) {
+                            chatRoom.displayRoomMembers(dos, command[1]);
+                        }
+                        break;
+
+                    case "Join" :
+                        if (command.length == 2) {
+                            chatRoom.joinRoom(s, command[1]);
+                            dos.writeUTF("Joined chat room: " + command[1]);
+                        }
+                        break;
+                    case "SendMessage" :
+                        if (command.length == 3) {
+                            chatRoom.sendMessage(command[2], command[1]);
+                        }
+                        break;
 					default: 
 						dos.writeUTF("Invalid input"); 
 						break; 
