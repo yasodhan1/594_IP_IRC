@@ -51,6 +51,7 @@ public class Client_mc
                 {
 			        System.out.println("Server crashed "); 
                     bl_conn=false;
+                    throw new IOException();
                 }
                 
 			} 
@@ -64,6 +65,10 @@ public class Client_mc
             bl_conn=false;
         } catch(SocketException e) {
 			System.out.println("Server sleeping "); 
+            bl_conn=false;
+        } catch(IOException e) {
+			System.out.println("Server crashed "); 
+            bl_conn=false;
 		}catch(Exception e){ 
 			e.printStackTrace(); 
 		} 
