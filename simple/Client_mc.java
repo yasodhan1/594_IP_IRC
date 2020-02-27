@@ -63,15 +63,12 @@ public class Client_mc
 			scn.close(); 
 			dis.close(); 
 			dos.close(); 
-<<<<<<< HEAD
         } catch(SocketException exception) {
 			System.out.println("Server sleeping "); 
        // } catch(NoSuchElementException e) {
         //    System.out.println("Connection closed");
    //     } catch(InterruptedException e) {
     //        System.out.println("Connection closed");
-=======
->>>>>>> parent of ac8c81f...  added no Server exception
 		}catch(Exception e){ 
 			e.printStackTrace(); 
 		} 
