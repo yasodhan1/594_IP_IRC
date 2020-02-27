@@ -1,5 +1,4 @@
-import java.lang.System;
-import java.lang.Runtime;
+
 import java.io.*; 
 import java.net.*; 
 import java.util.Scanner; 
@@ -28,7 +27,7 @@ public class Client_mc
 	
 			// establish the connection with server port 5056 
 			Socket s = new Socket(ip, 5056); 
-	        
+	
 			// obtaining input and out streams 
 			DataInputStream dis = new DataInputStream(s.getInputStream()); 
 			DataOutputStream dos = new DataOutputStream(s.getOutputStream()); 
@@ -44,30 +43,35 @@ public class Client_mc
 				 //   String tosend = "Exit";
                 //} 
 				dos.writeUTF(tosend); 
-				    // If client sends exit,close this connection 
-				    // and then break from the while loop 
-				    if(tosend.equals("Exit")) 
-				    { 
-				    	System.out.println("Closing this connection : " + s); 
-				    	s.close(); 
-				    	System.out.println("Connection closed"); 
-				    	break; 
-				    } 
+				
+				// If client sends exit,close this connection 
+				// and then break from the while loop 
+				if(tosend.equals("Exit")) 
+				{ 
+					System.out.println("Closing this connection : " + s); 
+					s.close(); 
+					System.out.println("Connection closed"); 
+					break; 
+				} 
 				
 				// printing date or time as requested by client 
 				String received = dis.readUTF(); 
 				System.out.println(received); 
 			} 
+			
 			// closing resources 
 			scn.close(); 
 			dis.close(); 
 			dos.close(); 
+<<<<<<< HEAD
         } catch(SocketException exception) {
 			System.out.println("Server sleeping "); 
        // } catch(NoSuchElementException e) {
         //    System.out.println("Connection closed");
    //     } catch(InterruptedException e) {
     //        System.out.println("Connection closed");
+=======
+>>>>>>> parent of ac8c81f...  added no Server exception
 		}catch(Exception e){ 
 			e.printStackTrace(); 
 		} 
