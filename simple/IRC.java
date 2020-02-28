@@ -58,7 +58,7 @@ public class IRC {
        // }
     }
 
-    public void removeRoomMember(String client, String roomName) {
+    public void removeRoomMember(Socket client, String roomName) {
         for (Room r: chatRooms) {
             if (r.match(roomName)) {
                 r.removeMember(client);
@@ -66,11 +66,11 @@ public class IRC {
         }
     }
 
-    public void sendMessage(String roomName, String message) {
+    public void sendMessage(String roomName, String message, String client_name) {
             for (Room r: chatRooms) {
                 System.out.println(" room name " + roomName + "message " + message);
                 if (r.match(roomName)) {
-                    r.sendMessage(message);
+                    r.sendMessage(client_name + " says " +message);
                 }
             }
           //  dos.writeUTF(response.toString());

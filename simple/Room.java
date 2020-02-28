@@ -24,7 +24,7 @@ public class Room {
     roomMembers.add(client);
  }
 
- public void removeMember(String client) {
+ public void removeMember(Socket client) {
      roomMembers.remove(client);
  }
 
@@ -46,7 +46,10 @@ public class Room {
             System.out.println( s.getInetAddress().toString() + ":" + s.getPort() + "  ");
             DataOutputStream clientout = new DataOutputStream(s.getOutputStream());
             clientout.writeUTF(message);
+            System.out.println(s.getInetAddress().toString() +" message " + message);
         }
+    } catch (SocketException e) {
+        e.printStackTrace(); 
     } catch (IOException e) {
         e.printStackTrace(); 
     }
