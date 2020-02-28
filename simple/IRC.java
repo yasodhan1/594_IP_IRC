@@ -68,6 +68,7 @@ public class IRC {
 
     public void sendMessage(String roomName, String message) {
             for (Room r: chatRooms) {
+                System.out.println(" room name " + roomName + "message " + message);
                 if (r.match(roomName)) {
                     r.sendMessage(message);
                 }

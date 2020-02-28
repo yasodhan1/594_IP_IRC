@@ -81,6 +81,7 @@ class ClientHandler extends Thread
 
 				// Ask user what he wants 
 				dos.writeUTF("What do you want? ( Date | Time | Create [roomName] | DisplayRooms )..\n"+ 
+                              "Join [roomName] | SendMessage [roomName] [message] .. \n" +
 							"Type Exit to terminate connection."); 
 				
 				// receive the answer from client 
@@ -137,7 +138,7 @@ class ClientHandler extends Thread
                         break;
                     case "SendMessage" :
                         if (command.length == 3) {
-                            chatRoom.sendMessage(command[2], command[1]);
+                            chatRoom.sendMessage(command[1], command[2]);
                         }
                         break;
 					default: 

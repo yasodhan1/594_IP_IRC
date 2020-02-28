@@ -39,9 +39,11 @@ public class Room {
  }
 
  public void sendMessage(String message) {
+            System.out.println(" message " + message);
     // Broadcast to all room members
     try {
         for (Socket s: roomMembers ) {
+            System.out.println( s.getInetAddress().toString() + ":" + s.getPort() + "  ");
             DataOutputStream clientout = new DataOutputStream(s.getOutputStream());
             clientout.writeUTF(message);
         }
