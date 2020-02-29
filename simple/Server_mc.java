@@ -133,7 +133,7 @@ class ClientHandler extends Thread
                         break;
                     case "SendMessage" :
                         if (command.length == 3) {
-                            chatRoom.sendMessage(command[1], command[2], this.name);
+                            chatRoom.sendMessage(command[1], command[2], this.name,this.s);
                         }
                         break;
 					default: 

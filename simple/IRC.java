@@ -66,11 +66,25 @@ public class IRC {
         }
     }
 
-    public void sendMessage(String roomName, String message, String client_name) {
+    public void sendMessage(String roomName, String message, String client_name, Socket client) {
             for (Room r: chatRooms) {
                 System.out.println(" room name " + roomName + "message " + message);
                 if (r.match(roomName)) {
-                    r.sendMessage(client_name + " says " +message);
+                    if(r.roomMembers.contains(client))
+                    {
+                        r.sendMessage(client_name + " in " + roomName +" says " +message);
+                    }
+                    else
+                    {
+                        System.out.println(" cannot send message to room name " + roomName + "message " + message);
+                        String retMessage = " You cannot send message to room name " + roomName + " - not a member";
+                        try {
+                        DataOutputStream clientout = new DataOutputStream(client.getOutputStream());
+                        clientout.writeUTF(retMessage);
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                    }
                 }
             }
           //  dos.writeUTF(response.toString());

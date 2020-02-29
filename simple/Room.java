@@ -46,7 +46,7 @@ public class Room {
             System.out.println( s.getInetAddress().toString() + ":" + s.getPort() + "  ");
             DataOutputStream clientout = new DataOutputStream(s.getOutputStream());
             clientout.writeUTF(message);
-            System.out.println(s.getInetAddress().toString() +" message " + message);
+            //System.out.println(s.getInetAddress().toString() +" message " + message);
         }
     } catch (SocketException e) {
         e.printStackTrace(); 
