@@ -44,7 +44,7 @@ public class Client_mc
 				}
                 } catch(IOException e) {
 			        System.out.println("Server crashed in send"); 
-                    System.exit(0);
+                    e.printStackTrace(); 
                 }
             }
             }} );
@@ -59,10 +59,15 @@ public class Client_mc
 				try {
                         String received = dis.readUTF(); 
 				        System.out.println(received);
+                        if(received.equals("Bye"))
+                        {
+                            exit=true;
+                            System.exit(0);
+                            break;
+                        }
                 } catch(IOException e) {
 			        System.out.println("Server crashed in receieve" );
-                    System.exit(0);
-                 // e.printStackTrace(); 
+                    e.printStackTrace(); 
                 }
                 
 			}
