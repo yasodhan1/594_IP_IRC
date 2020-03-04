@@ -1,6 +1,6 @@
 /*************************************************************************
 This code is developed for IRC project 
-By - Harriet Adkins and Yasodha Surkyakumar
+By - Harriet Adkins and Yasodha Suriyakumar
 Class - CS 494/594 Winter 2020 
 Two classes in here - one for Server and other to handle clients
 ************************************************************************/
@@ -28,45 +28,38 @@ public class Server_mc
         @Override
         public void run() {
             String userInput = null; 
-        while (true) 
-        {
-            try
-            {
-            userInput = scn.nextLine();
-            // If user sends exit, inform clients, and close this connection 
-            if(userInput.equals("Exit"))
-            {
-                System.out.println("Server connection closing..");
-                serverExit = true;
-                for (Socket s: activeClients ) {
-                    if(!s.isClosed())
-                    {
-                        DataOutputStream dos = new DataOutputStream(s.getOutputStream());
-                        dos.writeUTF("Server is disconnecting");
-                        dos.writeUTF("Bye");
-                        s.close();
+            while (true) {
+                try {
+                    userInput = scn.nextLine();
+                    // If user sends exit, inform clients, and close this connection 
+                    if(userInput.equals("Exit")) {
+                        System.out.println("Server connection closing..");
+                        serverExit = true;
+                        for (Socket s: activeClients ) {
+                            if(!s.isClosed()) {
+                                DataOutputStream dos = new DataOutputStream(s.getOutputStream());
+                                dos.writeUTF("Server is disconnecting");
+                                dos.writeUTF("Bye");
+                                s.close();
+                            }
+                        }
+                        ss.close();
+                        System.exit(0);
+                    } else {
+                        System.out.println("Ignoring invalid input");
                     }
+                } catch(Exception e) {
+                    System.out.println("Server crashed in send");
+                    e.printStackTrace();
                 }
-                ss.close();
-                System.exit(0);
-            } else {
-                System.out.println("Ignoring invalid input");
-            }
-            } catch(Exception e) {
-                System.out.println("Server crashed in send");
-                e.printStackTrace();
-            }
             }
             }} );
         disconnectServer.start();
 
-		while (!serverExit) 
-		{ 
-			try
-			{ 
+		while (!serverExit) { 
+			try { 
 				// socket object to receive incoming client requests 
-                if(!(ss.isClosed()))
-                {
+                if(!(ss.isClosed())) {
 				    s = ss.accept(); 
                     activeClients.add(s);
 				    System.out.println("A new client is connected : " + s); 
@@ -81,9 +74,7 @@ public class Server_mc
 			} catch (SocketException e) {
                 if(s.isClosed() && ss.isClosed()) {
                     System.out.println("No client and Server connections open");
-                }
-                else
-                {
+                } else {
                     System.out.println("Socket exception in Server main");
 				    e.printStackTrace();
                 } 
@@ -125,17 +116,16 @@ class ClientHandler extends Thread
 		String toreturn; 
         boolean bl_conn=true;
 		Date date = new Date(); 
-		while (bl_conn && (!(this.s.isClosed()))) 
-		{ 
+		while (bl_conn && (!(this.s.isClosed()))){ 
 			try { 
+                /* Dont think this is needed here
                 if((this.s.isClosed()))
                 {
                     bl_conn=false;
                     System.out.println(" socket closed ");
                     break;
                 }
-
-                    System.out.println(" after socket closed ");
+                */
 				// Ask user what he wants 
 				dos.writeUTF( this.name + " > What do you want? ( Date | Time | Create [roomName] | DisplayRooms | \n"+ 
                               "DisplayRoomMembers [roomName] | Join [roomName] | Leave [roomName] | SendMessage [roomName] [message] .. ) \n" +
@@ -158,7 +148,6 @@ class ClientHandler extends Thread
 						toreturn = fordate.format(date); 
 						dos.writeUTF(toreturn); 
 						break; 
-						
 					case "Time" : 
 						toreturn = fortime.format(date); 
 						dos.writeUTF(toreturn); 
@@ -166,6 +155,8 @@ class ClientHandler extends Thread
                     case "Create" :
                         if (command.length == 2) {
                             chatRoom.createRoom(dos, command[1]);
+                        } else {
+                            dos.writeUTF("Invalid input - Create [roomName]");
                         }
                         break;
                     case "DisplayRooms" :
@@ -174,22 +165,29 @@ class ClientHandler extends Thread
                     case "DisplayRoomMembers" :
                         if (command.length == 2) {
                             chatRoom.displayRoomMembers(dos, command[1]);
+                        } else {
+                            dos.writeUTF("Invalid input - DisplayRoomMembers [roomName]");
                         }
                         break;
-
                     case "Join" :
                         if (command.length == 2) {
                             chatRoom.joinRoom(s, command[1]);
+                        } else {
+                            dos.writeUTF("Invalid input - Join [roomName]");
                         }
                         break;
                     case "Leave" :
                         if (command.length == 2) {
                             chatRoom.removeRoomMember(s, command[1]);
-                            dos.writeUTF("Leaving chat room: " + command[1]);
+                        } else {
+                            dos.writeUTF("Invalid input - Leave [roomName]");
                         }
+                        break;
                     case "SendMessage" :
                         if (command.length == 3) {
                             chatRoom.sendMessage(command[1], command[2], this.name,this.s);
+                        } else {
+                            dos.writeUTF("Invalid input - SendMessage [roomName] [message]");
                         }
                         break;
 					default: 
@@ -203,10 +201,8 @@ class ClientHandler extends Thread
                     break;
 			} catch (SocketException e) { 
                 bl_conn=false;
-                if(this.s.isClosed())
-                {
-                    bl_conn=false;
-                    System.out.println(" Client " + this.name + "socket closed by Server");
+                if(this.s.isClosed()) {
+                    System.out.println(" Client " + this.name + " socket closed by Server");
                     break;
                 }
 				System.out.println(" Client crashed "+ this.name +" - Connection closed"); 
@@ -216,13 +212,12 @@ class ClientHandler extends Thread
 			} 
 		} 
 		
+		// closing resources 
 		try
 		{ 
-			// closing resources 
 			this.dis.close(); 
 			this.dos.close(); 
-			
-		}catch(IOException e){ 
+		} catch(IOException e){ 
 			e.printStackTrace(); 
 		} 
 	} 

@@ -1,4 +1,9 @@
-// Manage chat rooms
+/*************************************************************************
+This code is developed for IRC project 
+By - Harriet Adkins and Yasodha Surkyakumar
+Class - CS 494/594 Winter 2020 
+Manage chat rooms
+************************************************************************/
 
 import java.io.*; 
 import java.text.*; 
@@ -80,67 +85,74 @@ public class IRC {
     }
 
     public void joinRoom(Socket client, String roomName) {
-    boolean bl_room = false;
-    String retMessage = null;
-            for (Room r: chatRooms) {
-                if (r.match(roomName)) {
-                    bl_room = true;
-                    r.addMember(client);
-                    retMessage = " You joined room " + roomName;
-                }
-            }
-            if(bl_room == false)
-            {
-                    retMessage = " You cannot join room " + roomName +" - No such room exists";
-            }
-            try {
-             DataOutputStream clientout = new DataOutputStream(client.getOutputStream());
-             clientout.writeUTF(retMessage);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-
-    public void removeRoomMember(Socket client, String roomName) {
+        boolean bl_room = false;
+        String retMessage = null;
         for (Room r: chatRooms) {
             if (r.match(roomName)) {
+                bl_room = true;
+                r.addMember(client);
+                retMessage = " You joined room " + roomName;
+            }
+        }
+        if(bl_room == false) {
+                retMessage = " You cannot join room " + roomName +" - No such room exists";
+        }
+        try {
+            DataOutputStream clientout = new DataOutputStream(client.getOutputStream());
+            clientout.writeUTF(retMessage);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void removeRoomMember(Socket client, String roomName) {
+        boolean bl_room = false;
+        String retMessage = null;
+        for (Room r: chatRooms) {
+            if (r.match(roomName)) {
+                bl_room = true;
+                retMessage = " You are leaving room " + roomName;
                 r.removeMember(client);
             }
+        }
+        if(bl_room == false) {
+                retMessage = " You cannot leave room " + roomName +" - No such room exists";
+        }
+        try {
+            DataOutputStream clientout = new DataOutputStream(client.getOutputStream());
+            clientout.writeUTF(retMessage);
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
     
     public void removeMemberFromRooms(Socket client) {
         for (Room r: chatRooms) {
-            if(r.roomMembers.contains(client))
-            {
+            if(r.roomMembers.contains(client)){
                 removeRoomMember(client, r.roomName);
             }
         }
     }
 
     public void sendMessage(String roomName, String message, String client_name, Socket client) {
-            for (Room r: chatRooms) {
-                System.out.println(" room name " + roomName + "message " + message);
-                if (r.match(roomName)) {
-                    if(r.roomMembers.contains(client))
-                    {
-                        r.sendMessage( client.getInetAddress().getHostAddress() + ":" + client.getPort() + 
-                                         " in room " + roomName +" says " +message);
-                    }
-                    else
-                    {
-                        System.out.println(" cannot send message to room name " + roomName + "message " + message);
-                        String retMessage = " You cannot send message to room name " + roomName + " - not a member";
-                        try {
-                        DataOutputStream clientout = new DataOutputStream(client.getOutputStream());
-                        clientout.writeUTF(retMessage);
+        for (Room r: chatRooms) {
+            //System.out.println(" room name " + roomName + "message " + message);
+            if (r.match(roomName)) {
+                if(r.roomMembers.contains(client)){
+                    r.sendMessage( client.getInetAddress().getHostAddress() + ":" + client.getPort() + 
+                                     " in room " + roomName +" says " +message);
+                } else {
+                    System.out.println(" cannot send message to room name " + roomName + "message " + message);
+                    String retMessage = " You cannot send message to room name " + roomName + " - not a member";
+                    try {
+                            DataOutputStream clientout = new DataOutputStream(client.getOutputStream());
+                            clientout.writeUTF(retMessage);
                         } catch (IOException e) {
                             e.printStackTrace();
                         }
-                    }
                 }
             }
-          //  dos.writeUTF(response.toString());
+        }
         /*
         //for (Map.Entry<String, String> message : messages.entrySet()) {
             for (Room r: chatRooms) {

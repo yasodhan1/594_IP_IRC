@@ -1,5 +1,9 @@
-// Room object that handles room members and functionality
-
+/*************************************************************************
+This code is developed for IRC project 
+By - Harriet Adkins and Yasodha Suriyakumar
+Class - CS 494/594 Winter 2020 
+Room object that handles room members and functionality
+************************************************************************/
 import java.util.List;
 import java.util.LinkedList;
 import java.io.*; 
@@ -39,7 +43,7 @@ public class Room {
  }
 
  public void sendMessage(String message) {
-            System.out.println(" message " + message);
+    //System.out.println(" message " + message);
     // Broadcast to all room members
     try {
         for (Socket s: roomMembers ) {
