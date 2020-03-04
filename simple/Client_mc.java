@@ -6,16 +6,22 @@ import java.util.Scanner;
 // Client class 
 public class Client_mc 
 { 
-
 	public static void main(String[] args) throws IOException 
 	{ 
 			Scanner scn = new Scanner(System.in); 
 			InetAddress ip = InetAddress.getByName("localhost"); 
-			Socket s = new Socket(ip, 5056); 
-	
-			DataInputStream dis = new DataInputStream(s.getInputStream()); 
-			DataOutputStream dos = new DataOutputStream(s.getOutputStream()); 
-	
+            Socket s    = null;
+            try{
+			 s = new Socket(ip, 5056); 
+            } catch(SocketException e) {
+			    System.out.println("Server sleeping ");
+            }
+            if(s==null)
+            {
+                 System.exit(0);
+            }
+			    DataOutputStream dos = new DataOutputStream(s.getOutputStream()); 
+                DataInputStream dis = new DataInputStream(s.getInputStream()); 
             Thread sendMessage = new Thread(new Runnable()  
             { 
             @Override

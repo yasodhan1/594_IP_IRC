@@ -49,13 +49,20 @@ public class IRC {
     }
 
     public void joinRoom(Socket client, String roomName) {
-        //for (String n: roomNames) {
             for (Room r: chatRooms) {
                 if (r.match(roomName)) {
                     r.addMember(client);
                 }
+                else {
+                    String retMessage = " You cannot join room " + roomName +" No such room exists";
+                    try {
+                     DataOutputStream clientout = new DataOutputStream(client.getOutputStream());
+                     clientout.writeUTF(retMessage);
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                } 
             }
-       // }
     }
 
     public void removeRoomMember(Socket client, String roomName) {

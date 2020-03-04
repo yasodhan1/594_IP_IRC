@@ -23,9 +23,7 @@ public class Server_mc
 			{ 
 				// socket object to receive incoming client requests 
 				s = ss.accept(); 
-				
 				System.out.println("A new client is connected : " + s); 
-				
 				DataInputStream dis = new DataInputStream(s.getInputStream()); 
 				DataOutputStream dos = new DataOutputStream(s.getOutputStream()); 
 				System.out.println("Assigning new thread for this client"); 
@@ -77,8 +75,8 @@ class ClientHandler extends Thread
 			try { 
 
 				// Ask user what he wants 
-				dos.writeUTF("What do you want? ( Date | Time | Create [roomName] | DisplayRooms "+ 
-                              "Join [roomName] | SendMessage [roomName] [message] .. ) \n" +
+				dos.writeUTF( this.name + " > What do you want? \n ( Date | Time | Create [roomName] | DisplayRooms |"+ 
+                              "DisplayRoomMembers | Join [roomName] | Leave [roomName] | SendMessage [roomName] [message] .. ) \n" +
 							"Type Exit to terminate connection."); 
 				
 				// receive the answer from client 
@@ -131,6 +129,11 @@ class ClientHandler extends Thread
                             dos.writeUTF("Joined chat room: " + command[1]);
                         }
                         break;
+                    case "Leave" :
+                        if (command.length == 2) {
+                            chatRoom.removeRoomMember(s, command[1]);
+                            dos.writeUTF("Leaving chat room: " + command[1]);
+                        }
                     case "SendMessage" :
                         if (command.length == 3) {
                             chatRoom.sendMessage(command[1], command[2], this.name,this.s);
