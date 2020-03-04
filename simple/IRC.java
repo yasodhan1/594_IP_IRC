@@ -59,21 +59,23 @@ public class IRC {
 
     public void createRoom(DataOutputStream dos, String roomName) {
     boolean bl_room = true;
+    String response = null;
         try {
             for (Room r: chatRooms) {
                 if (r.match(roomName)) {
-                    String response = "Room with name "+ roomName +" exists already"; 
+                    response = "Room with name "+ roomName +" exists already"; 
                     bl_room = false;
-                    dos.writeUTF(response);
                 }
             }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
         if(bl_room==true)
         {
             Room newRoom = new Room(roomName);
             chatRooms.add(newRoom);
+            response = "You created room - "+ roomName; 
+        }
+        dos.writeUTF(response);
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
 
@@ -103,6 +105,15 @@ public class IRC {
         for (Room r: chatRooms) {
             if (r.match(roomName)) {
                 r.removeMember(client);
+            }
+        }
+    }
+    
+    public void removeMemberFromRooms(Socket client) {
+        for (Room r: chatRooms) {
+            if(r.roomMembers.contains(client))
+            {
+                removeRoomMember(client, r.roomName);
             }
         }
     }

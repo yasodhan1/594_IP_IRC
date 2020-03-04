@@ -85,7 +85,9 @@ class ClientHandler extends Thread
 				if(command[0].equals("Exit")) 
 				{ 
 					System.out.println("Client " + this.name + " sends exit..."); 
+                    chatRoom.removeMemberFromRooms(this.s);
 					System.out.println("Closing this connection."); 
+                    dos.writeUTF("You are disconnected");
 					this.s.close(); 
 					System.out.println("Connection closed"); 
 					break; 
@@ -110,7 +112,6 @@ class ClientHandler extends Thread
                     case "Create" :
                         if (command.length == 2) {
                             chatRoom.createRoom(dos, command[1]);
-                            dos.writeUTF("Created chat room: " + command[1]);
                         }
                         break;
                     case "DisplayRooms" :
@@ -144,6 +145,7 @@ class ClientHandler extends Thread
 			} catch (EOFException e) { 
                     bl_conn=false;
 					System.out.println(" No client "+ this.name +" - Connection closed"); 
+                    chatRoom.removeMemberFromRooms(this.s);
 			} catch (SocketException e) { 
                     bl_conn=false;
 					System.out.println(" Client crashed "+ this.name +" - Connection closed"); 

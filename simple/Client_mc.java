@@ -6,6 +6,7 @@ import java.util.Scanner;
 // Client class 
 public class Client_mc 
 { 
+    static volatile boolean exit = false; 
 	public static void main(String[] args) throws IOException 
 	{ 
 			Scanner scn = new Scanner(System.in); 
@@ -20,13 +21,14 @@ public class Client_mc
             {
                  System.exit(0);
             }
-			    DataOutputStream dos = new DataOutputStream(s.getOutputStream()); 
-                DataInputStream dis = new DataInputStream(s.getInputStream()); 
+		    DataOutputStream dos = new DataOutputStream(s.getOutputStream()); 
+            DataInputStream dis = new DataInputStream(s.getInputStream()); 
             Thread sendMessage = new Thread(new Runnable()  
             { 
             @Override
             public void run() { 
-			while (true) 
+			//while (true) 
+			while (!exit) 
 			{ 
                 try
                 {
@@ -37,6 +39,7 @@ public class Client_mc
 				if(tosend.equals("Exit")) 
 				{ 
 					System.out.println("Connection closed"); 
+                    exit = true;
 					break; 
 				}
                 } catch(IOException e) {
@@ -50,7 +53,8 @@ public class Client_mc
             { 
             @Override
             public void run() {  
-			while (true) 
+			//while (true)
+			while (!exit) 
 			{ 
 				try {
                         String received = dis.readUTF(); 
