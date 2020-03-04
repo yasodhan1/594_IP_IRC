@@ -18,11 +18,18 @@ public class IRC {
     }
 
     public void displayRooms(DataOutputStream dos) {
-        StringBuilder response = new StringBuilder("All rooms: ");
+        StringBuilder response = null; 
+        boolean bl_room = false;
         try {
+             response = new StringBuilder("All rooms: ");
             for(Room r: chatRooms) {
                 r.displayRoomName(response);
+                bl_room = true;
             }
+            if(bl_room == false)
+            {
+                response = new StringBuilder(" No rooms exist");
+            } 
             dos.writeUTF(response.toString());
         } catch(IOException e) {
             e.printStackTrace();
@@ -30,12 +37,19 @@ public class IRC {
     }
 
     public void displayRoomMembers(DataOutputStream dos, String roomName) {
-        StringBuilder response = new StringBuilder("Members of " + roomName + ": ");
+        StringBuilder response =null;
+        boolean bl_room = false;
         try {
+            response = new StringBuilder("Members of " + roomName + ": ");
             for (Room r: chatRooms) {
                 if (r.match(roomName)) {
+                    bl_room = true;
                     r.displayRoomMembers(response);
                 }
+            }
+            if(bl_room == false)
+            {
+                response = new StringBuilder("No such room " + roomName + "exists");
             }
             dos.writeUTF(response.toString());
         } catch (IOException e) { 
@@ -44,26 +58,46 @@ public class IRC {
     }
 
     public void createRoom(DataOutputStream dos, String roomName) {
-        Room newRoom = new Room(roomName);
-        chatRooms.add(newRoom);
+    boolean bl_room = true;
+        try {
+            for (Room r: chatRooms) {
+                if (r.match(roomName)) {
+                    String response = "Room with name "+ roomName +" exists already"; 
+                    bl_room = false;
+                    dos.writeUTF(response);
+                }
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        if(bl_room==true)
+        {
+            Room newRoom = new Room(roomName);
+            chatRooms.add(newRoom);
+        }
     }
 
     public void joinRoom(Socket client, String roomName) {
+    boolean bl_room = false;
+    String retMessage = null;
             for (Room r: chatRooms) {
                 if (r.match(roomName)) {
+                    bl_room = true;
                     r.addMember(client);
+                    retMessage = " You joined room " + roomName;
                 }
-                else {
-                    String retMessage = " You cannot join room " + roomName +" No such room exists";
-                    try {
-                     DataOutputStream clientout = new DataOutputStream(client.getOutputStream());
-                     clientout.writeUTF(retMessage);
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-                } 
             }
-    }
+            if(bl_room == false)
+            {
+                    retMessage = " You cannot join room " + roomName +" - No such room exists";
+            }
+            try {
+             DataOutputStream clientout = new DataOutputStream(client.getOutputStream());
+             clientout.writeUTF(retMessage);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
 
     public void removeRoomMember(Socket client, String roomName) {
         for (Room r: chatRooms) {
@@ -79,7 +113,8 @@ public class IRC {
                 if (r.match(roomName)) {
                     if(r.roomMembers.contains(client))
                     {
-                        r.sendMessage(client_name + " in " + roomName +" says " +message);
+                        r.sendMessage( client.getInetAddress().getHostAddress() + ":" + client.getPort() + 
+                                         " in room " + roomName +" says " +message);
                     }
                     else
                     {

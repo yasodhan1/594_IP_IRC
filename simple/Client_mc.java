@@ -40,8 +40,9 @@ public class Client_mc
 					break; 
 				}
                 } catch(IOException e) {
-			    System.out.println("Server crashed in sendMessage"); 
-            }
+			        System.out.println("Server crashed in send"); 
+                    System.exit(0);
+                }
             }
             }} );
              // readMessage thread 
@@ -49,15 +50,14 @@ public class Client_mc
             { 
             @Override
             public void run() {  
-            boolean bl_conn =true;
-			while (bl_conn) 
+			while (true) 
 			{ 
 				try {
                         String received = dis.readUTF(); 
 				        System.out.println(received);
                 } catch(IOException e) {
-                bl_conn=false;
-			    System.out.println("Server crashed in readMessage" );
+			        System.out.println("Server crashed in receieve" );
+                    System.exit(0);
                  // e.printStackTrace(); 
                 }
                 

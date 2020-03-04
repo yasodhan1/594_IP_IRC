@@ -34,7 +34,7 @@ public class Room {
 
  public void displayRoomMembers(StringBuilder response) {
          for (Socket s: roomMembers) {
-            response.append(s.getInetAddress().toString() + ":" + s.getPort() + "  ");
+            response.append(s.getInetAddress().getHostAddress() + ":" + s.getPort() + "  ");
          }
  }
 
@@ -43,7 +43,7 @@ public class Room {
     // Broadcast to all room members
     try {
         for (Socket s: roomMembers ) {
-            System.out.println( s.getInetAddress().toString() + ":" + s.getPort() + "  ");
+            //System.out.println( s.getInetAddress().toString() + ":" + s.getPort() + "  ");
             DataOutputStream clientout = new DataOutputStream(s.getOutputStream());
             clientout.writeUTF(message);
             //System.out.println(s.getInetAddress().toString() +" message " + message);

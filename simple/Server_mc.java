@@ -9,7 +9,6 @@ import java.net.*;
 public class Server_mc 
 { 
     public static IRC chatRooms = new IRC();
-    static int client_id =0;
 
 	public static void main(String[] args) throws IOException 
 	{ 
@@ -27,11 +26,10 @@ public class Server_mc
 				DataInputStream dis = new DataInputStream(s.getInputStream()); 
 				DataOutputStream dos = new DataOutputStream(s.getOutputStream()); 
 				System.out.println("Assigning new thread for this client"); 
-				Thread t = new ClientHandler(s, chatRooms, dis, dos, client_id); 
+				Thread t = new ClientHandler(s, chatRooms, dis, dos); 
 
 				// Invoking the start() method 
 				t.start(); 
-                client_id++;
 				
 			} 
 			catch (Exception e){ 
@@ -55,13 +53,14 @@ class ClientHandler extends Thread
 	
 
 	// Constructor 
-	public ClientHandler(Socket s, IRC chatRoom, DataInputStream dis, DataOutputStream dos, int client_id) 
+	public ClientHandler(Socket s, IRC chatRoom, DataInputStream dis, DataOutputStream dos)
 	{ 
 		this.s = s; 
 		this.dis = dis; 
 		this.dos = dos; 
         this.chatRoom = chatRoom;
-        this.name = "Client " +client_id;
+        //this.name = "Client_" +client_id;
+        this.name = s.getInetAddress().getHostAddress() + ":" + s.getPort(); 
 	} 
 
 	@Override
@@ -75,8 +74,8 @@ class ClientHandler extends Thread
 			try { 
 
 				// Ask user what he wants 
-				dos.writeUTF( this.name + " > What do you want? \n ( Date | Time | Create [roomName] | DisplayRooms |"+ 
-                              "DisplayRoomMembers | Join [roomName] | Leave [roomName] | SendMessage [roomName] [message] .. ) \n" +
+				dos.writeUTF( this.name + " > What do you want? ( Date | Time | Create [roomName] | DisplayRooms | \n"+ 
+                              "DisplayRoomMembers [roomName] | Join [roomName] | Leave [roomName] | SendMessage [roomName] [message] .. ) \n" +
 							"Type Exit to terminate connection."); 
 				
 				// receive the answer from client 
@@ -85,7 +84,7 @@ class ClientHandler extends Thread
 				command = received.trim().split("[ ,\\t]+");
 				if(command[0].equals("Exit")) 
 				{ 
-					System.out.println("Client " + this.name + this.s + " sends exit..."); 
+					System.out.println("Client " + this.name + " sends exit..."); 
 					System.out.println("Closing this connection."); 
 					this.s.close(); 
 					System.out.println("Connection closed"); 
@@ -126,7 +125,6 @@ class ClientHandler extends Thread
                     case "Join" :
                         if (command.length == 2) {
                             chatRoom.joinRoom(s, command[1]);
-                            dos.writeUTF("Joined chat room: " + command[1]);
                         }
                         break;
                     case "Leave" :
@@ -145,10 +143,10 @@ class ClientHandler extends Thread
 				} 
 			} catch (EOFException e) { 
                     bl_conn=false;
-					System.out.println(" No client - Connection closed"); 
+					System.out.println(" No client "+ this.name +" - Connection closed"); 
 			} catch (SocketException e) { 
                     bl_conn=false;
-					System.out.println(" Client crashed - Connection closed"); 
+					System.out.println(" Client crashed "+ this.name +" - Connection closed"); 
 			} catch (IOException e) { 
 				e.printStackTrace(); 
 			} 
