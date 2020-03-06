@@ -98,8 +98,7 @@ public class IRC {
                 } else {
                     retMessage = ">> You are already a member of " + roomName;
                 }
-            }
-            if(blNewMember ==true) {
+                if(blNewMember ==true) {
                 for (Socket s: r.roomMembers) {
                     if(s!= client) {
                     try {
@@ -109,6 +108,7 @@ public class IRC {
                         e.printStackTrace();
                     }
                     }
+                }
                 }
             }
         }
@@ -125,14 +125,30 @@ public class IRC {
 
     public void removeRoomMember(Socket client, String roomName, boolean bl_msg_flag) {
         boolean bl_room = false;
+        boolean bl_member = false;
         String retMessage = null;
         for (Room r: chatRooms) {
-            if ((r.match(roomName)) &&
-                (r.roomMembers.contains(client))){
+            if (r.match(roomName)){ 
                 bl_room = true;
-                retMessage = ">> You are leaving room " + roomName;
-                //System.out.println(" room name in leave " +roomName);
-                r.removeMember(client);
+                if (r.roomMembers.contains(client)){
+                    bl_member = true;
+                    retMessage = ">> You are leaving room " + roomName;
+                    //System.out.println(" room name in leave " +roomName);
+                    r.removeMember(client);
+                }
+                if((bl_room==true) && (bl_member == true))
+                {
+                    for (Socket s: r.roomMembers) {
+                    if(s!=client) {
+                    try {
+                        DataOutputStream clientout = new DataOutputStream(s.getOutputStream());
+                        clientout.writeUTF(" >> Client " + client.getInetAddress().getHostAddress() + ":" + client.getPort()+ " left room " +roomName);
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                    }
+                    }
+                }
             }
         }
         if(bl_room == false) {
