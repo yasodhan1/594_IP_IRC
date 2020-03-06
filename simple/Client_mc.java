@@ -1,77 +1,96 @@
-
+/*************************************************************************
+This code is developed for IRC project 
+By - Harriet Adkins and Yasodha Suriyakumar
+Class - CS 494/594 Winter 2020 
+One class with two threads to lister for Client, receive messages from 
+    Server
+************************************************************************/
 import java.io.*; 
 import java.net.*; 
 import java.util.Scanner; 
-import java.util.NoSuchElementException;
 
-// Client class 
 public class Client_mc 
 { 
+    static volatile boolean exit = false; 
 	public static void main(String[] args) throws IOException 
 	{ 
-    Runtime.getRuntime().addShutdownHook(new Thread() 
-    {
-        @Override
-        public void run() 
-        {
-        System.out.println("Shutdown");
+		Scanner scn = new Scanner(System.in); 
+		InetAddress ip = InetAddress.getByName("localhost"); 
+        Socket s    = null;
+        try{
+			 s = new Socket(ip, 5056); 
+        } catch(SocketException e) {
+			System.out.println("Server sleeping ");
         }
-    });
-    
-		try
+        if(s==null){
+            System.exit(0);
+        }
+		DataOutputStream dos = new DataOutputStream(s.getOutputStream()); 
+        DataInputStream dis = new DataInputStream(s.getInputStream()); 
+        Thread sendMessage = new Thread(new Runnable()  
+        { 
+        @Override
+        public void run() { 
+		//while (true) 
+		while (!exit) 
 		{ 
-			Scanner scn = new Scanner(System.in); 
-			
-			// getting localhost ip 
-			InetAddress ip = InetAddress.getByName("localhost"); 
-	
-			// establish the connection with server port 5056 
-			Socket s = new Socket(ip, 5056); 
-	
-			// obtaining input and out streams 
-			DataInputStream dis = new DataInputStream(s.getInputStream()); 
-			DataOutputStream dos = new DataOutputStream(s.getOutputStream()); 
-	
-			// the following loop performs the exchange of 
-			// information between client and client handler 
-			while (true) 
-			{ 
-				System.out.println(dis.readUTF()); 
-				//try {
-                    String tosend = scn.nextLine(); 
-                //} catch(NoSuchElementException e) {
-				 //   String tosend = "Exit";
-                //} 
-				dos.writeUTF(tosend); 
-				
-				// If client sends exit,close this connection 
-				// and then break from the while loop 
-				if(tosend.equals("Exit")) 
-				{ 
-					System.out.println("Closing this connection : " + s); 
-					s.close(); 
-					System.out.println("Connection closed"); 
+            try
+            {
+				String tosend = scn.nextLine(); 
+				dos.writeUTF(tosend);
+				// If client sends exit break from the while loop 
+				if(tosend.equals("Exit")){ 
+					System.out.println("Connection closing.."); 
+                    exit = true;
 					break; 
-				} 
-				
-				// printing date or time as requested by client 
-				String received = dis.readUTF(); 
-				System.out.println(received); 
-			} 
+				}
+            } catch(IOException e) {
+			        System.out.println("Server crashed"); 
+                    e.printStackTrace(); 
+            }
+        }
+        }} );
+        // readMessage thread 
+        Thread readMessage = new Thread(new Runnable()  
+        { 
+        @Override
+        public void run() {  
+		//while (true)
+		while (!exit) 
+		{ 
+			try {
+                    String received = dis.readUTF(); 
+			        System.out.println(received);
+                    if(received.equals("Bye")) {
+                        exit=true;
+                        System.exit(0);
+                        break;
+                    }
+                } catch(IOException e) {
+			        System.out.println("Server crashed" );
+                    System.exit(0);
+                    e.printStackTrace(); 
+                }
+		}
+        } } );
+            
+        sendMessage.start(); 
+        readMessage.start();  
 			
-			// closing resources 
+		// closing resource - figure out how to do it right 
+        /*
+        try{
+            s.close();
 			scn.close(); 
 			dis.close(); 
 			dos.close(); 
-        } catch(SocketException exception) {
-			System.out.println("Server sleeping "); 
-       // } catch(NoSuchElementException e) {
-        //    System.out.println("Connection closed");
-   //     } catch(InterruptedException e) {
-    //        System.out.println("Connection closed");
+        } catch(SocketException e) {
+			System.out.println("Server sleeping ");
+        } catch(IOException e) {
+			System.out.println("Server crashed in close connection"); 
 		}catch(Exception e){ 
 			e.printStackTrace(); 
-		} 
-	} 
+		} */
+    }
 } 
 
