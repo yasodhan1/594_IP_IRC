@@ -86,15 +86,29 @@ public class IRC {
 
     public void joinRoom(Socket client, String roomName) {
         boolean bl_room = false;
+        boolean blNewMember = false;
         String retMessage = null;
         for (Room r: chatRooms) {
             if (r.match(roomName)) {
                 bl_room = true;
                 if(!(r.roomMembers.contains(client))){
+                    blNewMember = true;
                     r.addMember(client);
                     retMessage = ">> You joined room " + roomName;
                 } else {
                     retMessage = ">> You are already a member of " + roomName;
+                }
+            }
+            if(blNewMember ==true) {
+                for (Socket s: r.roomMembers) {
+                    if(s!= client) {
+                    try {
+                        DataOutputStream clientout = new DataOutputStream(s.getOutputStream());
+                        clientout.writeUTF(" >> New client " + client.getInetAddress().getHostAddress() + ":" + client.getPort()+ " in room " +roomName);
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                    }
                 }
             }
         }
