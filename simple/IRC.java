@@ -33,8 +33,9 @@ public class IRC {
             }
             if(bl_room == false)
             {
-                response = new StringBuilder(">>  No rooms exist");
+                response = new StringBuilder(">>  No rooms exist  ");
             } 
+            response.setLength( response.length() - 1 );
             dos.writeUTF(response.toString());
         } catch(IOException e) {
             e.printStackTrace();
@@ -54,8 +55,9 @@ public class IRC {
             }
             if(bl_room == false)
             {
-                response = new StringBuilder(">> No such room " + roomName + "exists");
+                response = new StringBuilder(">> No such room " + roomName + "exists ");
             }
+            response.setLength( response.length() - 1 );
             dos.writeUTF(response.toString());
         } catch (IOException e) { 
             e.printStackTrace(); 
