@@ -128,7 +128,7 @@ class ClientHandler extends Thread
                 */
 				// Ask user what he wants 
 				dos.writeUTF( this.name + " > What do you want? ( Date | Time | Create [roomName] | DisplayRooms | \n"+ 
-                              "DisplayRoomMembers [roomName] | Join [roomName] | Leave [roomName] | SendMessage [roomName] [message] .. ) \n" +
+                              "DisplayRoomMembers [roomName] | Join [roomName] | Leave [roomName] | SendMessage [roomName]:[message] .. ) \n" +
 							"Type Exit to terminate connection."); 
 				
 				// receive the answer from client 
@@ -184,10 +184,13 @@ class ClientHandler extends Thread
                         }
                         break;
                     case "SendMessage" :
-                        if (command.length == 3) {
-                            chatRoom.sendMessage(command[1], command[2], this.name,this.s);
+                        if (command.length >= 2) {
+                            for (int i = 1; i < command.length; ++i) {
+                                  String [] splitMessage = command[i].split(":");
+                                  chatRoom.sendMessage(splitMessage[0], splitMessage[1], this.name,this.s);
+                            }
                         } else {
-                            dos.writeUTF("Invalid input - SendMessage [roomName] [message]");
+                            dos.writeUTF("Invalid input - SendMessage [roomName]:[message]");
                         }
                         break;
 					default: 
