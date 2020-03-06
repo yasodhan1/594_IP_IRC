@@ -116,6 +116,7 @@ class ClientHandler extends Thread
 		String toreturn; 
         boolean bl_conn=true;
 		Date date = new Date(); 
+        boolean bl_print_options=true;
 		while (bl_conn && (!(this.s.isClosed()))){ 
 			try { 
                 /* Dont think this is needed here
@@ -127,10 +128,13 @@ class ClientHandler extends Thread
                 }
                 */
 				// Ask user what he wants 
-				dos.writeUTF( this.name + " > What do you want? ( Date | Time | Create [roomName] | DisplayRooms | \n"+ 
+                if(bl_print_options)
+                {
+				    dos.writeUTF( this.name + " > Your options are: ( Date | Time | Create [roomName] | DisplayRooms | \n"+ 
                               "DisplayRoomMembers [roomName] | Join [roomName] | Leave [roomName] | SendMessage [roomName] [message] .. ) \n" +
-							"Type Exit to terminate connection."); 
-				
+							"Type Options for choices or Exit to terminate connection."); 
+                    bl_print_options=false;
+				}
 				// receive the answer from client 
 				received = dis.readUTF(); 
 				String[] command = null; 
@@ -139,7 +143,7 @@ class ClientHandler extends Thread
                     case "Exit" :
 					    System.out.println("Client " + this.name + " sends exit..."); 
                         chatRoom.removeMemberFromRooms(this.s);
-					    System.out.println("Closing this connection."); 
+					    System.out.println("Closing this connection..."); 
                         dos.writeUTF("You are disconnected");
 					    this.s.close(); 
 					    System.out.println("Connection closed " + this.name); 
@@ -151,6 +155,11 @@ class ClientHandler extends Thread
 					case "Time" : 
 						toreturn = fortime.format(date); 
 						dos.writeUTF(toreturn); 
+						break; 
+                    case "Options":
+				        dos.writeUTF( this.name + " > What do you want? ( Date | Time | Create [roomName] | DisplayRooms | \n"+ 
+                              "DisplayRoomMembers [roomName] | Join [roomName] | Leave [roomName] | SendMessage [roomName] [message] .. ) \n" +
+							"Type Exit to terminate connection."); 
 						break; 
                     case "Create" :
                         if (command.length == 2) {
@@ -184,8 +193,9 @@ class ClientHandler extends Thread
                         }
                         break;
                     case "SendMessage" :
-                        if (command.length == 3) {
-                            chatRoom.sendMessage(command[1], command[2], this.name,this.s);
+                        if (command.length >= 3) {
+                            String message = received.substring(received.indexOf(command[2]));
+                            chatRoom.sendMessage(command[1], message, this.name,this.s);
                         } else {
                             dos.writeUTF("Invalid input - SendMessage [roomName] [message]");
                         }
@@ -197,7 +207,7 @@ class ClientHandler extends Thread
 			} catch (EOFException e) { 
                     bl_conn=false;
 					System.out.println(" Client "+ this.name +" crashed - Connection closed"); 
-                    System.out.println(" Client closed status " + this.name + this.s.isClosed());
+                    //System.out.println(" Client closed status " + this.name + this.s.isClosed());
                     break;
 			} catch (SocketException e) { 
                 bl_conn=false;
