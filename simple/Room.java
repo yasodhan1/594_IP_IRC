@@ -33,13 +33,17 @@ public class Room {
  }
 
  public void displayRoomName(StringBuilder response)  {
-        response.append(this.roomName + " ");
+    response.append(this.roomName + " ");
  }
 
  public void displayRoomMembers(StringBuilder response) {
+    if(roomMembers.size() ==0 ){
+        response.append(" None");
+     } else {
          for (Socket s: roomMembers) {
             response.append(s.getInetAddress().getHostAddress() + ":" + s.getPort() + "  ");
          }
+    }
  }
 
  public void sendMessage(String message) {

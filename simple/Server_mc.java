@@ -167,8 +167,10 @@ class ClientHandler extends Thread
                             String roomNames = received.substring(received.indexOf(command[1]));
                             String [] splitRooms = roomNames.split(",");
                             for (int i = 0; i < splitRooms.length; i++) {
-                                if(splitRooms[i].indexOf(":") == -1) {
-                                    chatRoom.createRoom(dos, splitRooms[i].trim());
+                                if((splitRooms[i].indexOf(":") == -1)) { 
+                                    if ((!splitRooms[i].trim().isEmpty())) {
+                                        chatRoom.createRoom(dos, splitRooms[i].trim());
+                                    }
                                 } else {
                                     dos.writeUTF(">> Invalid roomName " + splitRooms[i]+" ':' not allowed");
                                 }

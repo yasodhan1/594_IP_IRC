@@ -113,7 +113,8 @@ public class IRC {
         boolean bl_room = false;
         String retMessage = null;
         for (Room r: chatRooms) {
-            if (r.match(roomName)) {
+            if ((r.match(roomName)) &&
+                (r.roomMembers.contains(client))){
                 bl_room = true;
                 retMessage = ">> You are leaving room " + roomName;
                 //System.out.println(" room name in leave " +roomName);
