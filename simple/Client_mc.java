@@ -45,7 +45,7 @@ public class Client_mc
 					break; 
 				}
             } catch(IOException e) {
-			        System.out.println("Server crashed in send"); 
+			        System.out.println("Server crashed"); 
                     e.printStackTrace(); 
             }
         }
@@ -67,7 +67,7 @@ public class Client_mc
                         break;
                     }
                 } catch(IOException e) {
-			        System.out.println("Server crashed in receieve" );
+			        System.out.println("Server crashed" );
                     System.exit(0);
                     e.printStackTrace(); 
                 }

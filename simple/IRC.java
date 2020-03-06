@@ -26,14 +26,14 @@ public class IRC {
         StringBuilder response = null; 
         boolean bl_room = false;
         try {
-             response = new StringBuilder("All rooms: ");
+             response = new StringBuilder(">> All rooms: ");
             for(Room r: chatRooms) {
                 r.displayRoomName(response);
                 bl_room = true;
             }
             if(bl_room == false)
             {
-                response = new StringBuilder(" No rooms exist");
+                response = new StringBuilder(">>  No rooms exist");
             } 
             dos.writeUTF(response.toString());
         } catch(IOException e) {
@@ -45,7 +45,7 @@ public class IRC {
         StringBuilder response =null;
         boolean bl_room = false;
         try {
-            response = new StringBuilder("Members of " + roomName + ": ");
+            response = new StringBuilder(">> Members of " + roomName + ": ");
             for (Room r: chatRooms) {
                 if (r.match(roomName)) {
                     bl_room = true;
@@ -54,7 +54,7 @@ public class IRC {
             }
             if(bl_room == false)
             {
-                response = new StringBuilder("No such room " + roomName + "exists");
+                response = new StringBuilder(">> No such room " + roomName + "exists");
             }
             dos.writeUTF(response.toString());
         } catch (IOException e) { 
@@ -68,7 +68,7 @@ public class IRC {
         try {
             for (Room r: chatRooms) {
                 if (r.match(roomName)) {
-                    response = "Room with name "+ roomName +" exists already"; 
+                    response = ">> Room with name "+ roomName +" exists already"; 
                     bl_room = false;
                 }
             }
@@ -76,7 +76,7 @@ public class IRC {
         {
             Room newRoom = new Room(roomName);
             chatRooms.add(newRoom);
-            response = "You created room - "+ roomName; 
+            response = ">> You created room - "+ roomName; 
         }
         dos.writeUTF(response);
         } catch (IOException e) {
@@ -90,12 +90,16 @@ public class IRC {
         for (Room r: chatRooms) {
             if (r.match(roomName)) {
                 bl_room = true;
-                r.addMember(client);
-                retMessage = " You joined room " + roomName;
+                if(!(r.roomMembers.contains(client))){
+                    r.addMember(client);
+                    retMessage = ">> You joined room " + roomName;
+                } else {
+                    retMessage = ">> You are already a member of " + roomName;
+                }
             }
         }
         if(bl_room == false) {
-                retMessage = " You cannot join room " + roomName +" - No such room exists";
+                retMessage = ">> You cannot join room " + roomName +" - No such room exists";
         }
         try {
             DataOutputStream clientout = new DataOutputStream(client.getOutputStream());
@@ -105,22 +109,25 @@ public class IRC {
         }
     }
 
-    public void removeRoomMember(Socket client, String roomName) {
+    public void removeRoomMember(Socket client, String roomName, boolean bl_msg_flag) {
         boolean bl_room = false;
         String retMessage = null;
         for (Room r: chatRooms) {
             if (r.match(roomName)) {
                 bl_room = true;
-                retMessage = " You are leaving room " + roomName;
+                retMessage = ">> You are leaving room " + roomName;
+                //System.out.println(" room name in leave " +roomName);
                 r.removeMember(client);
             }
         }
         if(bl_room == false) {
-                retMessage = " You cannot leave room " + roomName +" - No such room exists";
+                retMessage = ">> You cannot leave room " + roomName +" - No such room exists";
         }
         try {
             DataOutputStream clientout = new DataOutputStream(client.getOutputStream());
-            clientout.writeUTF(retMessage);
+            if(bl_msg_flag) {
+                clientout.writeUTF(retMessage);
+            }
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -129,7 +136,7 @@ public class IRC {
     public void removeMemberFromRooms(Socket client) {
         for (Room r: chatRooms) {
             if(r.roomMembers.contains(client)){
-                removeRoomMember(client, r.roomName);
+                removeRoomMember(client, r.roomName, false);
             }
         }
     }
@@ -139,11 +146,11 @@ public class IRC {
             //System.out.println(" room name " + roomName + "message " + message);
             if (r.match(roomName)) {
                 if(r.roomMembers.contains(client)){
-                    r.sendMessage( client.getInetAddress().getHostAddress() + ":" + client.getPort() + 
+                    r.sendMessage(">> "+ client.getInetAddress().getHostAddress() + ":" + client.getPort() + 
                                      " in room " + roomName +" says " +message);
                 } else {
-                    System.out.println(" cannot send message to room name " + roomName + "message " + message);
-                    String retMessage = " You cannot send message to room name " + roomName + " - not a member";
+                    //System.out.println(" cannot send message to room name " + roomName + "message " + message);
+                    String retMessage = ">> You cannot send message to room name " + roomName + " - not a member";
                     try {
                             DataOutputStream clientout = new DataOutputStream(client.getOutputStream());
                             clientout.writeUTF(retMessage);

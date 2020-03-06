@@ -130,11 +130,12 @@ class ClientHandler extends Thread
 				// Ask user what he wants 
                 if(bl_print_options)
                 {
-				    dos.writeUTF( this.name + " > Your options are: ( Date | Time | Create [roomName] | DisplayRooms | \n"+ 
-                              "DisplayRoomMembers [roomName] | Join [roomName] | Leave [roomName] | SendMessage [roomName] [message] .. ) \n" +
-							"Type Options for choices or Exit to terminate connection."); 
+				    dos.writeUTF(">> Your name is "+this.name + "\n>> Your options are: ( Date | Time | Create [roomName(,s)] | DisplayRooms | \n"+ 
+                              ">> DisplayRoomMembers [roomName(,s)] | Join [roomName(,s)] | Leave [roomName(,s)] | SendMessage [roomName]:[message],[roomName]:[message]) \n" +
+							">> Type Options for choices or Exit to terminate connection."); 
                     bl_print_options=false;
 				}
+				
 				// receive the answer from client 
 				received = dis.readUTF(); 
 				String[] command = null; 
@@ -143,10 +144,10 @@ class ClientHandler extends Thread
                     case "Exit" :
 					    System.out.println("Client " + this.name + " sends exit..."); 
                         chatRoom.removeMemberFromRooms(this.s);
-					    System.out.println("Closing this connection..."); 
+					    System.out.println("Closing connection..."); 
                         dos.writeUTF("You are disconnected");
 					    this.s.close(); 
-					    System.out.println("Connection closed " + this.name); 
+					    System.out.println("Connection closed for " + this.name); 
 					    break; 
 					case "Date" : 
 						toreturn = fordate.format(date); 
@@ -157,51 +158,90 @@ class ClientHandler extends Thread
 						dos.writeUTF(toreturn); 
 						break; 
                     case "Options":
-				        dos.writeUTF( this.name + " > What do you want? ( Date | Time | Create [roomName] | DisplayRooms | \n"+ 
-                              "DisplayRoomMembers [roomName] | Join [roomName] | Leave [roomName] | SendMessage [roomName] [message] .. ) \n" +
-							"Type Exit to terminate connection."); 
+				        dos.writeUTF(">> Your name is "+this.name + "\n>> Your options are: ( Date | Time | Create [roomName(,s)] | DisplayRooms | \n"+ 
+                              ">> DisplayRoomMembers [roomName(,s)] | Join [roomName(,s)] | Leave [roomName(,s)] | SendMessage [roomName]:[message],[roomName]:[message]) \n" +
+							">> Type Options for choices or Exit to terminate connection."); 
 						break; 
                     case "Create" :
-                        if (command.length == 2) {
-                            chatRoom.createRoom(dos, command[1]);
+                        if (command.length >= 2) {
+                            String roomNames = received.substring(received.indexOf(command[1]));
+                            String [] splitRooms = roomNames.split(",");
+                            for (int i = 0; i < splitRooms.length; i++) {
+                                if(splitRooms[i].indexOf(":") == -1) {
+                                    chatRoom.createRoom(dos, splitRooms[i].trim());
+                                } else {
+                                    dos.writeUTF(">> Invalid roomName " + splitRooms[i]+" ':' not allowed");
+                                }
+                            }
                         } else {
-                            dos.writeUTF("Invalid input - Create [roomName]");
+                            dos.writeUTF(">> Invalid input - Create [roomName], [roomName]");
                         }
                         break;
                     case "DisplayRooms" :
                         chatRoom.displayRooms(dos);
                         break;
                     case "DisplayRoomMembers" :
-                        if (command.length == 2) {
-                            chatRoom.displayRoomMembers(dos, command[1]);
+                        if (command.length >= 2) {
+                            String roomNames = received.substring(received.indexOf(command[1]));
+                            String [] splitRooms = roomNames.split(",");
+                            for (int i = 0; i < splitRooms.length; i++) {
+                                if(splitRooms[i].indexOf(":") == -1) {
+                                chatRoom.displayRoomMembers(dos, splitRooms[i].trim());
+                                } else {
+                                    dos.writeUTF(">> Invalid roomName " + splitRooms[i]+" ':' not allowed");
+                                }
+                            }
                         } else {
-                            dos.writeUTF("Invalid input - DisplayRoomMembers [roomName]");
+                            dos.writeUTF(">> Invalid input - DisplayRoomMembers [roomName], [roomName]");
                         }
                         break;
                     case "Join" :
-                        if (command.length == 2) {
-                            chatRoom.joinRoom(s, command[1]);
+                        if (command.length >= 2) {
+                            String roomNames = received.substring(received.indexOf(command[1]));
+                            String [] splitRooms = roomNames.split(",");
+                            for (int i = 0; i < splitRooms.length; i++) {
+                                if(splitRooms[i].indexOf(":") == -1) {
+                                chatRoom.joinRoom(s, splitRooms[i].trim());
+                                } else {
+                                    dos.writeUTF(">> Invalid roomName " + splitRooms[i]+" ':' not allowed");
+                                }
+                            }
                         } else {
-                            dos.writeUTF("Invalid input - Join [roomName]");
+                            dos.writeUTF(">> Invalid input - Join [roomName], [roomName]");
                         }
                         break;
                     case "Leave" :
-                        if (command.length == 2) {
-                            chatRoom.removeRoomMember(s, command[1]);
+                        if (command.length >= 2) {
+                            String roomNames = received.substring(received.indexOf(command[1]));
+                            String [] splitRooms = roomNames.split(",");
+                            for (int i = 0; i < splitRooms.length; i++) {
+                                if(splitRooms[i].indexOf(":") == -1) {
+                                chatRoom.removeRoomMember(s, splitRooms[i].trim(),true);
+                                } else {
+                                    dos.writeUTF(">> Invalid roomName " + splitRooms[i]+" ':' not allowed");
+                                }
+                            }
                         } else {
-                            dos.writeUTF("Invalid input - Leave [roomName]");
+                            dos.writeUTF(">> Invalid input - Leave [roomName], [roomName]");
                         }
                         break;
                     case "SendMessage" :
-                        if (command.length >= 3) {
-                            String message = received.substring(received.indexOf(command[2]));
-                            chatRoom.sendMessage(command[1], message, this.name,this.s);
+                            //String message = received.substring(received.indexOf(command[2]));
+                            //chatRoom.sendMessage(command[1], message, this.name,this.s);
+                        if ((command.length >= 2) && 
+                            (received.indexOf(":") != -1)) {
+                            String roomMsg = received.substring(received.indexOf(command[1]));
+                            String [] splitRoomMessage = roomMsg.split(",");
+                            for (int i = 0; i < splitRoomMessage.length; i++) {
+                                 String [] splitMessage = splitRoomMessage[i].split(":");
+                                 chatRoom.sendMessage(splitMessage[0].trim(), splitMessage[1], this.name,this.s);
+                            }
                         } else {
-                            dos.writeUTF("Invalid input - SendMessage [roomName] [message]");
+                            dos.writeUTF(">> Invalid input - SendMessage [roomName]:[message], [roomName]:[message]..");
                         }
                         break;
 					default: 
-						dos.writeUTF("Invalid input"); 
+						dos.writeUTF(">> Invalid input"); 
 						break; 
 				} 
 			} catch (EOFException e) { 
